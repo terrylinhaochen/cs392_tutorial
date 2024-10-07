@@ -1,5 +1,5 @@
 import React from 'react';
-import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import Banner from './components/Banner';
 import CourseList from './components/CourseList';
 
@@ -35,7 +35,7 @@ const schedule = {
 
 const App = () => (
     <div>
-      <Banner title={schedule.title} />
+      <Banner title={"CS Course Schedule"} />
       <CourseList courses={schedule.courses} />
     </div>
   );

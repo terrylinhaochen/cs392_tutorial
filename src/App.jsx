@@ -1,5 +1,6 @@
 import React from 'react';
 import './App.css';
+import Banner from './components/Banner';
 import CourseList from './components/CourseList';
 
 const schedule = {
@@ -32,18 +33,11 @@ const schedule = {
   }
 };
 
-const App = () => {
-  const today = new Date();
-  const day = today.toLocaleString([], {weekday: 'long'});
-  const date = today.toLocaleDateString([], {dateStyle: 'long'})
-
-  return (
+const App = () => (
     <div>
-      <h1>{schedule.title}</h1>
-      <p>Today is {day}, {date}.</p>
+      <Banner title={schedule.title} />
       <CourseList courses={schedule.courses} />
     </div>
   );
-};
 
 export default App;

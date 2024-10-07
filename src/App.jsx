@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import logo from './logo.svg';
+import React from 'react';
 import './App.css';
+import CourseList from './components/CourseList';
 
 const schedule = {
   "title": "CS Courses for 2018-2019",
@@ -39,9 +39,9 @@ const App = () => {
 
   return (
     <div>
-      <h1>Sample React code</h1>
-      
+      <h1>{schedule.title}</h1>
       <p>Today is {day}, {date}.</p>
+      <CourseList courses={schedule.courses} />
     </div>
   );
 };

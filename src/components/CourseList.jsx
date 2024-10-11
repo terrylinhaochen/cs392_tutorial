@@ -11,16 +11,18 @@ const CourseCard = ({ course }) => (
   </div>
 );
 
-const CourseList = () => {
+const CourseList = ({ selectedTerm }) => {
   const { data, isLoading, error } = useCourses();
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
+  const filteredCourses = Object.entries(data.courses).filter(([, course]) => course.term === selectedTerm);
+
   return (
     <div className="container">
       <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-        {Object.entries(data.courses).map(([id, course]) => (
+        {filteredCourses.map(([id, course]) => (
           <div key={id} className="col mb-4">
             <CourseCard course={course} />
           </div>

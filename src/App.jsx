@@ -1,8 +1,7 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Banner from './components/Banner';
-import CourseList from './components/CourseList';
-import { useCourses } from './utilities/useCourses';
+import TermPage from './components/TermPage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient();
@@ -12,7 +11,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <div>
         <Banner title={"CS Course Schedule"} />
-        <CourseList />
+        <TermPage />
       </div>
     </QueryClientProvider>
   );

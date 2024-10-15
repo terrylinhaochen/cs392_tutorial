@@ -17,17 +17,17 @@ const CourseList = ({ selectedTerm }) => {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
+  if (!data || !data.courses) return <div>No courses available</div>;
+
   const filteredCourses = Object.entries(data.courses).filter(([, course]) => course.term === selectedTerm);
 
   return (
-    <div className="container">
-      <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-        {filteredCourses.map(([id, course]) => (
-          <div key={id} className="col mb-4">
-            <CourseCard course={course} />
-          </div>
-        ))}
-      </div>
+    <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+      {filteredCourses.map(([id, course]) => (
+        <div key={id} className="col mb-4">
+          <CourseCard course={course} />
+        </div>
+      ))}
     </div>
   );
 };

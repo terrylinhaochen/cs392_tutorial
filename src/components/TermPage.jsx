@@ -10,7 +10,10 @@ const TermPage = () => {
   const [selectedTerm, setSelectedTerm] = useState('Fall');
   const [selectedCourses, setSelectedCourses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { data } = useCourses();
+  const { data, isLoading, error } = useCourses(); // Fetch courses here
+
+  if (isLoading) return <div>Loading...</div>; // Handle loading state
+  if (error) return <div>Error: {error.message}</div>; // Handle error state
 
   const toggleCourseSelection = (courseId) => {
     const courseToToggle = data.courses[courseId];
@@ -48,9 +51,10 @@ const TermPage = () => {
         selectedTerm={selectedTerm} 
         selectedCourses={selectedCourses}
         toggleCourseSelection={toggleCourseSelection}
+        courses={data.courses} // Pass courses to CourseList
       />
       <Modal open={isModalOpen} close={closeModal}>
-        <CoursePlan selectedCourses={selectedCourses} courses={data?.courses || {}} />
+        <CoursePlan selectedCourses={selectedCourses} courses={data.courses} />
       </Modal>
     </div>
   );

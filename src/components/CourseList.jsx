@@ -1,6 +1,7 @@
 import React from 'react';
 import { useCourses } from '../utilities/useCourses';
 import { hasConflict } from '../utilities/timeConflictUtils'; // Import the hasConflict function
+import { Link } from 'react-router-dom';
 
 const CourseCard = ({ course, id, isSelected, onToggleSelection, isSelectable }) => (
   <div 
@@ -13,6 +14,7 @@ const CourseCard = ({ course, id, isSelected, onToggleSelection, isSelectable })
       <p className="card-text flex-grow-1">{course.title}</p>
       <p className="card-text mt-auto"><small className="text-muted">{course.meets}</small></p>
       {!isSelectable && <span className="text-danger">✖</span>} {/* Indicate unselectable */}
+      <Link to={`/edit-course/${id}`} className="btn btn-warning mt-2">Edit</Link> {/* Edit button */}
     </div>
   </div>
 );

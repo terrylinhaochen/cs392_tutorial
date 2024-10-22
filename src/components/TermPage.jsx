@@ -4,7 +4,7 @@ import CourseList from './CourseList';
 import Modal from './Modal';
 import CoursePlan from './CoursePlan';  
 import { useCourses } from '../utilities/useCourses';
-
+import { hasConflict } from '../utilities/timeConflictUtils'; // Import the conflict utility
 
 const TermPage = () => {
   const [selectedTerm, setSelectedTerm] = useState('Fall');
@@ -13,11 +13,26 @@ const TermPage = () => {
   const { data } = useCourses();
 
   const toggleCourseSelection = (courseId) => {
-    setSelectedCourses(prevSelected => 
-      prevSelected.includes(courseId)
-        ? prevSelected.filter(id => id !== courseId)
-        : [...prevSelected, courseId]
-    );
+    const courseToToggle = data.courses[courseId];
+
+    // Check if the course is currently selected
+    if (selectedCourses.includes(courseId)) {
+      // Allow deselection regardless of conflicts
+      setSelectedCourses(prevSelected => 
+        prevSelected.filter(id => id !== courseId)
+      );
+    } else {
+      // Only allow selection if there are no conflicts
+      const hasConflictWithSelected = selectedCourses.some(selectedId => 
+        hasConflict(courseToToggle, data.courses[selectedId])
+      );
+
+      if (!hasConflictWithSelected) {
+        setSelectedCourses(prevSelected => 
+          [...prevSelected, courseId]
+        );
+      }
+    }
   };
 
   const openModal = () => setIsModalOpen(true);

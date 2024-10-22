@@ -1,25 +1,31 @@
+// CourseEditForm.jsx
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useCourses } from '../utilities/useCourses'; // Import the custom hook
 
-const CourseEditForm = ({ courses }) => {
-  const { id } = useParams(); // Get the course ID from the URL
+const CourseEditForm = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
+  const { data, isLoading, error } = useCourses(); // Use the same hook as TermPage
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   // Find the course based on the ID
-  const course = courses.find(course => course.id === id); // Ensure courses is defined
+  const course = data.courses[id]; // Access course directly from the data object
 
   // Handle case where course is not found
   if (!course) {
-    return <div>Course not found</div>; // Display a message if the course is not found
+    return <div>Course not found</div>;
   }
 
   const handleSubmit = (event) => {
-    event.preventDefault(); // Prevent the default form submission
+    event.preventDefault();
     // For now, do nothing on submit
   };
 
   const handleCancel = () => {
-    navigate('/courses'); // Navigate back to the course list
+    navigate('/courses');
   };
 
   return (
@@ -32,7 +38,7 @@ const CourseEditForm = ({ courses }) => {
             type="text"
             className="form-control"
             id="courseTitle"
-            defaultValue={course.title} // Populate with existing course title
+            defaultValue={course.title}
           />
         </div>
         <div className="mb-3">
@@ -41,9 +47,10 @@ const CourseEditForm = ({ courses }) => {
             type="text"
             className="form-control"
             id="meetingTimes"
-            defaultValue={course.meets} // Populate with existing meeting times
+            defaultValue={course.meets}
           />
         </div>
+        <button type="submit" className="btn btn-primary me-2">Save</button>
         <button type="button" className="btn btn-secondary" onClick={handleCancel}>
           Cancel
         </button>

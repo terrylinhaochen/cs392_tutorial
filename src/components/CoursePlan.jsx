@@ -26,4 +26,4 @@ const CoursePlan = ({ selectedCourses, courses }) => {
   );
 };
 
-export default CoursePlan;  // Make sure this line is present
+export default CoursePlan; 

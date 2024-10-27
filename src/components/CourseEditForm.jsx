@@ -1,7 +1,7 @@
 // CourseEditForm.jsx
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCourses } from '../utilities/useCourses'; 
+import { useCourses } from '../utilities/firebase';
 import useFormValidation from '../hooks/useFormValidation';  
 
 const CourseEditForm = () => {

@@ -23,11 +23,13 @@ const CourseList = ({ selectedTerm, selectedCourses, toggleCourseSelection }) =>
   const { data, isLoading, error } = useCourses();
 
   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
+  if (error) return <div>Error: {error.toString()}</div>;
 
-  if (!data || !data.courses) return <div>No courses available</div>;
-
-  const filteredCourses = Object.entries(data.courses).filter(([, course]) => course.term === selectedTerm);
+  // Make sure we're accessing the correct data structure
+  const courses = data?.courses || {};
+  
+  const filteredCourses = Object.entries(courses)
+    .filter(([, course]) => course.term === selectedTerm);
 
   return (
     <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">

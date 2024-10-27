@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCourses, useDbUpdate } from '../utilities/firebase';
+import { useCourses, useDbUpdate, useAuthState } from '../utilities/firebase';  // Add useAuthState here
 import { useFormData } from '../utilities/useFormData';
 
 // Keep component definitions outside
@@ -43,7 +43,8 @@ const validateCourseData = (key, val) => {
 };
 
 const CourseEditForm = () => {
-  // All hooks at the top level
+  // Add auth state check at the top with other hooks
+  const [user] = useAuthState();
   const { id } = useParams();
   const navigate = useNavigate();
   const { data, isLoading, error } = useCourses();
@@ -53,6 +54,13 @@ const CourseEditForm = () => {
     meetingTimes: ''
   });
 
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
+  
   // Use useEffect to update form data after loading
   useEffect(() => {
     if (data?.courses?.[id]) {

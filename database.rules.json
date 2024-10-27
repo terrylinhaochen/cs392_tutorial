@@ -1,9 +1,9 @@
 {
   "rules": {
+    ".read": true,
     "courses": {
       "$courseId": {
-        ".read": true,
-        ".write": true
+        ".write": "auth != null"  // Only authenticated users can write
       }
     }
   }

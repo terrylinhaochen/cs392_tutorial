@@ -1,7 +1,7 @@
 // CourseEditForm.jsx
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCourses } from '../utilities/firebase';
+import { useCourses } from '../utilities/useCourses'; // Ensure this is the correct import
 import useFormValidation from '../hooks/useFormValidation';  
 
 const CourseEditForm = () => {
@@ -9,8 +9,16 @@ const CourseEditForm = () => {
   const navigate = useNavigate();
   const { data, isLoading, error } = useCourses(); // Use the same hook as TermPage
 
+  // Handle loading state
   if (isLoading) return <div>Loading...</div>;
+
+  // Handle error state
   if (error) return <div>Error: {error.message}</div>;
+
+  // Check if data is available
+  if (!data || !data.courses) {
+    return <div>No courses available</div>; // Handle case where courses is not available
+  }
 
   // Find the course based on the ID
   const course = data.courses[id]; // Access course directly from the data object

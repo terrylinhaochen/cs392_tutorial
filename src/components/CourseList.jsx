@@ -1,28 +1,22 @@
 // src/components/CourseList.jsx
 import React from 'react';
-import { useCourses } from '../utilities/useCourses';
+import { useNavigate } from 'react-router-dom';
 import { hasConflict } from '../utilities/timeConflictUtils';
-import { useNavigate } from 'react-router-dom';  // Just import useNavigate
-import { useAuthState } from '../utilities/firebase';
+import { useAuthState, useDbData } from '../utilities/firebase';  // Update imports
 
 const CourseCard = ({ course, id, isSelected, onToggleSelection, isSelectable }) => {
   const [user] = useAuthState();
   const navigate = useNavigate();
 
-  const handleCardClick = () => {
-    onToggleSelection(id);
-  };
-
   const handleEdit = (e) => {
-    e.preventDefault();  // Prevent default
-    e.stopPropagation(); // Stop event bubbling
+    e.stopPropagation();
     navigate(`/edit-course/${id}`);
   };
 
   return (
     <div 
       className={`card h-100 ${isSelected ? 'bg-light border-primary' : ''} ${!isSelectable ? 'text-muted' : ''}`}
-      onClick={handleCardClick}
+      onClick={() => onToggleSelection(id)}
       style={{ cursor: 'pointer' }}
     >
       <div className="card-body d-flex flex-column">
@@ -34,7 +28,6 @@ const CourseCard = ({ course, id, isSelected, onToggleSelection, isSelectable })
         {!isSelectable && <span className="text-danger">✖</span>}
         {user && (
           <button
-            type="button"
             className="btn btn-warning mt-2"
             onClick={handleEdit}
           >
@@ -47,11 +40,12 @@ const CourseCard = ({ course, id, isSelected, onToggleSelection, isSelectable })
 };
 
 const CourseList = ({ selectedTerm, selectedCourses, toggleCourseSelection }) => {
-  const { data, isLoading, error } = useCourses();
+  const [data, error] = useDbData('/');  // Use Firebase data directly
+  const isLoading = !data && !error;
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
-  if (!data || !data.courses) return <div>No courses available</div>;
+  if (!data?.courses) return <div>No courses available</div>;
 
   const filteredCourses = Object.entries(data.courses)
     .filter(([, course]) => course.term === selectedTerm);

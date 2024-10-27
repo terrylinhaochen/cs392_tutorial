@@ -5,6 +5,7 @@ import Banner from './components/Banner';
 import TermPage from './components/TermPage';
 import CourseEditForm from './components/CourseEditForm'; // Import the CourseEditForm
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+// import DataMigration from './components/DataMigration';
 
 const queryClient = new QueryClient();
 
@@ -13,6 +14,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <Router>
         <div>
+          {/* <DataMigration />  Add this at the top of your app */}
           <Banner title={"CS Course Schedule"} />
           <Routes>
             <Route path="/" element={<Navigate to="/courses" />} /> {/* Redirect from root to /courses */}

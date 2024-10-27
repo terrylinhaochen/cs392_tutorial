@@ -1,44 +1,76 @@
-// CourseEditForm.jsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCourses } from '../utilities/useCourses'; // Ensure this is the correct import
-import useFormValidation from '../hooks/useFormValidation';  
+import { useCourses, useDbUpdate } from '../utilities/firebase';
+import { useFormData } from '../utilities/useFormData';
+
+// Keep component definitions outside
+const InputField = ({name, text, state, change}) => (
+  <div className="mb-3">
+    <label htmlFor={name} className="form-label">{text}</label>
+    <input 
+      className={`form-control ${state.errors?.[name] ? 'is-invalid' : ''}`}
+      id={name} 
+      name={name}
+      value={state.values[name] || ''} 
+      onChange={change} 
+    />
+    <div className="invalid-feedback">{state.errors?.[name]}</div>
+  </div>
+);
+
+const ButtonBar = ({message, disabled, onCancel}) => (
+  <div className="d-flex">
+    <button type="button" className="btn btn-secondary me-2" onClick={onCancel}>
+      Cancel
+    </button>
+    <button type="submit" className="btn btn-primary me-auto" disabled={disabled}>
+      Submit
+    </button>
+    <span className="p-2">{message}</span>
+  </div>
+);
+
+const validateCourseData = (key, val) => {
+  switch (key) {
+    case 'courseTitle':
+      return val.length >= 2 ? '' : 'Title must be at least 2 characters';
+    case 'meetingTimes':
+      if (!val) return '';
+      const timePattern = /^[MTWRF]+ \d{2}:\d{2}-\d{2}:\d{2}$/;
+      return timePattern.test(val) ? '' : 'Must contain days and start-end, e.g., MWF 12:00-13:20';
+    default: return '';
+  }
+};
 
 const CourseEditForm = () => {
+  // All hooks at the top level
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data, isLoading, error } = useCourses(); // Use the same hook as TermPage
-
-  // Handle loading state
-  if (isLoading) return <div>Loading...</div>;
-
-  // Handle error state
-  if (error) return <div>Error: {error.message}</div>;
-
-  // Check if data is available
-  if (!data || !data.courses) {
-    return <div>No courses available</div>; // Handle case where courses is not available
-  }
-
-  // Find the course based on the ID
-  const course = data.courses[id]; // Access course directly from the data object
-
-  // Handle case where course is not found
-  if (!course) {
-    return <div>Course not found</div>;
-  }
-
-  const { values, errors, handleChange, validateForm } = useFormValidation({
-    courseTitle: course.title,
-    meetingTimes: course.meets
+  const { data, isLoading, error } = useCourses();
+  const [update, result] = useDbUpdate(`/courses/${id}`);
+  const [state, change] = useFormData(validateCourseData, {
+    courseTitle: '',
+    meetingTimes: ''
   });
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    if (validateForm()) {
-      // Submit form if valid
-      console.log('Form is valid, submitting...', values);
-      // Add your submission logic here
+  // Use useEffect to update form data after loading
+  useEffect(() => {
+    if (data?.courses?.[id]) {
+      const course = data.courses[id];
+      change({ target: { id: 'courseTitle', value: course.title }});
+      change({ target: { id: 'meetingTimes', value: course.meets }});
+    }
+  }, [data, id]);
+
+  const handleSubmit = (evt) => {
+    evt.preventDefault();
+    if (!state.errors && data?.courses?.[id]) {
+      const updatedCourse = {
+        ...data.courses[id],
+        title: state.values.courseTitle,
+        meets: state.values.meetingTimes
+      };
+      update(updatedCourse);
     }
   };
 
@@ -46,54 +78,32 @@ const CourseEditForm = () => {
     navigate('/courses');
   };
 
+  // Show loading/error states
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+  if (!data?.courses?.[id]) return <div>Course not found</div>;
+
   return (
     <div className="container mt-5">
       <h2>Edit Course</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label htmlFor="courseTitle" className="form-label">
-            Course Title
-          </label>
-          <input
-            type="text"
-            className={`form-control ${errors.title ? 'is-invalid' : ''}`}
-            id="courseTitle"
-            value={values.courseTitle}
-            onChange={handleChange}
-          />
-          {errors.title && (
-            <div className="invalid-feedback">
-              {errors.title}
-            </div>
-          )}
-        </div>
-        <div className="mb-3">
-          <label htmlFor="meetingTimes" className="form-label">
-            Meeting Times
-          </label>
-          <input
-            type="text"
-            className={`form-control ${errors.meets ? 'is-invalid' : ''}`}
-            id="meetingTimes"
-            value={values.meetingTimes}
-            onChange={handleChange}
-          />
-          {errors.meets && (
-            <div className="invalid-feedback">
-              {errors.meets}
-            </div>
-          )}
-        </div>
-        <button type="submit" className="btn btn-primary me-2">
-          Save
-        </button>
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={handleCancel}
-        >
-          Cancel
-        </button>
+      <form onSubmit={handleSubmit} noValidate>
+        <InputField 
+          name="courseTitle" 
+          text="Course Title" 
+          state={state} 
+          change={change} 
+        />
+        <InputField 
+          name="meetingTimes" 
+          text="Meeting Times" 
+          state={state} 
+          change={change} 
+        />
+        <ButtonBar 
+          message={result?.message} 
+          disabled={!!state.errors}
+          onCancel={handleCancel}
+        />
       </form>
     </div>
   );

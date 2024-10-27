@@ -1,6 +1,5 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 import { getDatabase, ref, onValue, get, set } from 'firebase/database';
 import { useEffect, useState } from 'react';
 
@@ -21,7 +20,6 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const database = getDatabase(app);
 
 // Database hook
@@ -44,6 +42,23 @@ const useDbData = (path) => {
   }, [path]);
 
   return [data, error];
+};
+
+// New hook for updates
+export const useDbUpdate = (path) => {
+  const [result, setResult] = useState(null);
+  
+  const update = async (values) => {
+    try {
+      const dbRef = ref(database, path);
+      await set(dbRef, values);
+      setResult({ message: 'Success!' });
+    } catch (error) {
+      setResult({ message: error.message });
+    }
+  };
+
+  return [update, result];
 };
 
 // Make sure we're explicitly exporting useCourses
